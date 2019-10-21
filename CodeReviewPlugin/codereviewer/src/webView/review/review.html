@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="CodeReview" content="width=device-width, initial-scale=1.0">
+    <title>CodeReview</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="form_content">
+            <div class="perfectMessage" v-if="isShow">
+                <form action="#">
+                    <!-- <form action="#" v-model="perfectMessage" ref="perfectMessage"> -->
+                    <fieldset>
+                        <legend>完善信息</legend>
+                        <div class="form-row">
+                            <div class="field-label"><label>域账号：</label></div>
+                            <div class="field-half-widget">
+                                <input type="text" v-model="perfectMessage.dominAccount">
+                            </div>
+                            <div class="field-label"><label>密码：</label></div>
+                            <div class="field-half-widget">
+                                <input type="password" v-model="perfectMessage.dominPwd">
+                            </div>
+                            <input class="messageSubmit" type="submit" value="登录" @click="varifyAccount" />
+                        </div>
+                        <div class="form-row">
+                            <div class="field-label"><label>代码库：</label></div>
+                            <div class="field-half-widget">
+                                <select name="" id="" v-model="perfectMessage.repositories">
+                                    <option v-for="item in repositories">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="field-label"><label>token：</label></div>
+                            <div class="field-half-widget">
+                                <input type="text" v-model="perfectMessage.token">
+                            </div>
+                        </div>
+                        <input class="messageSubmit" type="submit" value="保存" @click="saveBasicInfo" />
+                        <input class="messageReset" type="button" value="重置" @click="resetBasicInfo" />
+                        <p class="textInfo">*操作指引：①输入密码进行账户授权登录 ②选择对应代码库后点击保存</p>
+                    </fieldset>
+                </form>
+            </div>
+            <form id="test" action="#" method="get" v-if="isShowForm">
+                <div>
+                    <button class="edutMessage" @click="editMessage">修改信息</button>
+                </div>
+                <fieldset>
+                    <legend>检视文件基本信息</legend>
+                    <div class="form-row">
+                        <div class="field-label"><label>文件名：</label></div>
+                        <div class="field-half-widget"><span name="fileName" id="fileNameId"
+                                class="required">{{fileInfo._fileName}}</span></div>
+                        <div class="field-label"><label>代码行：</label></div>
+                        <div class="field-half-widget"><span name="lineNum" id="lineNumId"
+                                class="required">{{fileInfo._sLineNumber}} ~ {{fileInfo._eLineNumber}}</span></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field-label"><label>文件路径：</label></div>
+                        <div class="field-full-widget"><span name="filePath" id="filePathId"
+                                class="required">{{fileInfo._filePath}}</span></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field-label"><label>代码块：</label></div>
+                        <div class="field-full-widget"><textarea class="required" readonly="readonly"
+                                v-model="fileInfo._codeBlock"></textarea></div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>上库信息</legend>
+                    <div class="form-row">
+                        <div class="field-label"><label>提交人：</label></div>
+                        <div class="field-half-widget">
+                            <select id="vInfoId" name="vInfo" class="validate-selection" v-model="selectVinfo">
+                                <option v-for="info in commitInfo" :value="info">{{info._author}} {{info._commitTime}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="field-label"><label>邮箱：</label></div>
+                        <div class="field-half-widget"><span name="email" id="emailId"
+                                class="required">{{selectVinfo._email}}</span></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="field-label"><label>版本号：</label></div>
+                        <div class="field-half-widget"><span name="version" id="versionId"
+                                class="required">{{selectVinfo._version}}</span></div>
+                        <div class="field-label"><label>上库时间：</label></div>
+                        <div class="field-half-widget"><span name="commitTime" id="commitTimeId"
+                                class="required">{{selectVinfo._commitTime}}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field-label"><label>上库日志：</label></div>
+                        <div class="field-full-widget"><textarea class="required-single" readonly="readonly"
+                                v-model="selectVinfo._subject"></textarea></div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend class="optional">检视信息</legend>
+
+                    <div class="form-row">
+                        <div class="field-label"><label>缺陷类型：</label></div>
+                        <div class="field-half-widget">
+                            <select id="vInfoId" name="vInfo" class="validate-selection" v-model="defectType">
+                                <option :value="info" v-for="(info,index) in defectTypes">{{info.lable}}</option>
+                            </select>
+                        </div>
+
+                        <div class="field-half-widget">
+                            <select id="vInfoId" name="vInfo" class="validate-selection" v-model="childType">
+                                <option :value="child" v-for="(child,index) in defectType.childTypes">{{child}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field-label"><label>缺陷等级：</label></div>
+                        <div class="field-full-widget">
+                            <select id="defectLevelId" name="defectLevel" class="validate-selection">
+                                <option v-for="item in defectLevels" v-bind:value="item.value">{{item.label}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field-label"><label>修改建议：</label></div>
+                        <div class="field-full-widget"><textarea class="optional" v-model="fixAdvice"></textarea></div>
+                    </div>
+                </fieldset>
+
+                <input class="submit" type="submit" value="提交" @click="submit" />
+                <input class="reset" type="button" value="重置" @click="reset" />
+            </form>
+        </div>
+    </div>
+    <script src="../../../lib/jquery/jquery.min.js"></script>
+    <script src="../../../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+    <script src="../../../lib/vue-2.5.17/vue.js"></script>
+    <script src="../review/review.js"></script>
+</body>
+
+</html>
